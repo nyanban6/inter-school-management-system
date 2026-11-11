@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model School {
+  id            String    @id @default(cuid())
+  name          String
+  code          String    @unique
+  location      String
+  category      String
+  status        String    @default("active")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  students      Student[]
+  staff         Staff[]
+  notices       Notice[]
+  events        Event[]
+  fees          Fee[]
+  books         LibraryBook[]
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  role          String
+  schoolId      String?
+  school        School?   @relation(fields: [schoolId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Student {
+  id            String    @id @default(cuid())
+  studentId     String    @unique
+  fullName      String
+  className     String
+  section       String
+  gender        String
+  dob           DateTime?
+  parentName    String
+  parentPhone   String
+  schoolId      String
+  school        School    @relation(fields: [schoolId], references: [id])
+  attendance    Attendance[]
+  exams         Exam[]
+  fees          Fee[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Staff {
+  id            String    @id @default(cuid())
+  employeeId    String    @unique
+  fullName      String
+  role          String
+  department    String
+  phone         String
+  schoolId      String
+  school        School    @relation(fields: [schoolId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Attendance {
+  id            String    @id @default(cuid())
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [id])
+  date          DateTime
+  status        String
+  remarks       String?
+  createdAt     DateTime  @default(now())
+}
+
+model Exam {
+  id            String    @id @default(cuid())
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [id])
+  examName      String
+  subject       String
+  score         Float
+  grade         String
+  remark        String?
+  createdAt     DateTime  @default(now())
+}
+
+model Fee {
+  id            String    @id @default(cuid())
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [id])
+  schoolId      String
+  school        School    @relation(fields: [schoolId], references: [id])
+  amount        Float
+  dueDate       DateTime
+  status        String
+  paymentMode   String?
+  createdAt     DateTime  @default(now())
+}
+
+model LibraryBook {
+  id            String    @id @default(cuid())
+  title         String
+  author        String
+  isbn          String    @unique
+  category      String
+  available     Int
+  schoolId      String
+  school        School    @relation(fields: [schoolId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Notice {
+  id            String    @id @default(cuid())
+  title         String
+  content       String
+  priority      String
+  schoolId      String
+  school        School    @relation(fields: [schoolId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  startDate     DateTime
+  endDate       DateTime
+  venue         String
+  schoolId      String
+  school        School    @relation(fields: [schoolId], references: [id])
+  createdAt     DateTime  @default(now())
+}
